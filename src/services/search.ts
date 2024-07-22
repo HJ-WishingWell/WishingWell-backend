@@ -20,17 +20,16 @@ export const maxiMalmarginalRelevanceSearch = async() => {
     );
 
     // const resultOne = await vectorStore.similaritySearch("I but new personal computer, so I want to decorate my desk ", 1);
-    const resultOne = await vectorStore.similaritySearch("I got some field about 1 acre so I want to make it to be a cactus garden", 1);
-
-    console.log(resultOne);
-    
-    // const resultOne = await vectorStore.maxMarginalRelevanceSearch("ช่วยแนะนำอุปกรณ์จัดโต๊ะคอม", {
-    //   k: 4,
-    //   fetchK: 20, // The number of documents to return on initial fetch
-    // });
+    // const resultOne = await vectorStore.similaritySearch("I got some field about 1 acre so I want to make it to be a cactus garden", 1);
     // console.log(resultOne);
+    
+    const resultOne = await vectorStore.maxMarginalRelevanceSearch("I got some field about 1 acre so I want to make it to be a garden with cactus", {
+      k: 3,
+      fetchK: 20, // The number of documents to return on initial fetch
+    });
+    console.log(resultOne);
 
-    // // Using MMR in a vector store retriever
+    // Using MMR in a vector store retriever
     // const retriever = await vectorStore.asRetriever({
     //   searchType: "mmr",
     //   searchKwargs: {
@@ -38,8 +37,8 @@ export const maxiMalmarginalRelevanceSearch = async() => {
     //     lambda: 0.1,
     //   },
     // });
-    // const retrieverOutput = await retriever.invoke("ตอบคำถามต่อไปนี้");
+    // const retrieverOutput = await retriever.invoke("I got some field about 1 acre so I want to make it to be a garden with cactus");
     // console.log(retrieverOutput);
-    
+
 }
 
