@@ -2,6 +2,7 @@ import { MongoDBAtlasVectorSearch } from "@langchain/mongodb"
 import { CohereEmbeddings } from "@langchain/cohere";
 import { MongoClient } from "mongodb";
 import * as dotenv from "dotenv";
+import { getallProduct } from "../modules/products/controller";
 
 dotenv.config();
 
@@ -11,27 +12,44 @@ export const createVectorStore = async() => {
     const [dbName, collectionName] = namespace.split(".");
     const collection = client.db(dbName).collection(collectionName);
 
+    const getproducts = await getallProduct()
+    const products = getproducts?.map((product) => {
+        return `{ name: '${product.name}', detail: '${product.detail}', category: '${product.category}'}`
+    })
+    const productsId = getproducts?.map((product) => {
+        return {
+            id: product._id.toString()
+        }
+    })
+
+    
+
     //vectorstore
     const vectorStore = await MongoDBAtlasVectorSearch.fromTexts(
         [
-					`{"name":"ต้นไม้ตั้งโต๊ะทำงาน เลือกต้นไม้ได้ พร้อมปลูก สวนจิ๋ว ต้นไม้ฟอกอากาศ ต้นไม้มงคล2","price":{"$numberInt":"199"},"detail":"ต้นไม้มงคล ต้นไม้ฟอกอากาศ พร้อมปลูกลงกระถางขนาด 4 นิ้ว ค่ะ 1 ชุดจะประกอบไปด้วย ต้นไม้ 1 ต้น + กระถางพร้อมจานรอง 4 นิ้ว + ตุ๊กตา 1 + เสาไฟ 1 + รั้วไม้ 1 + หินโรย","category":"จัดโต๊ะคอม","amount":{"$numberInt":"10"}}`,
-					`{"name":"คอมไฟคริสมาสต์ของตกแต่งตั้งโต๊ะ","price":{"$numberInt":"190"},"detail":"คอมไฟคริสมาสต์ของตกแต่งตั้งโต๊ะ"}`
-				],
-        [{ id: '669e16ed024d527082dd4598' }, {id: '669e1f190d929875d0a2127c'}],
+            `{"name":"christmas lamp","detail":"christmas lamp for decoration your desk","category":"decorate compute desk"}`,
+            `{"name":"Wooden Bookshelf","detail":"White wooden bookshlf, Brown wooden bookshelf, Black wooden bookshelf","category":"decorate compute desk"}`,
+            `{"name":"Monstera plastic plant","detail":"Fake plant, plastic plant","category":"decorate compute desk"}`,
+            `{"name":"Agricultural fertilizer","detail":"fertilizer for growing plants","category":"house and graden"}`,
+            `{"name":"Mini Cactus","detail":"Cactus size mini from India","category":"house and graden"}`,
+            `{"name":"Plant shovel","detail":"shovel tool for plant ","category":"house and graden"}`
+        ],
+        // [{ id: '669e16ed024d527082dd4598' }, {id: '669e1f190d929875d0a2127c'}],
+        productsId as any,
         new CohereEmbeddings({ model: "embed-english-v3.0", apiKey: process.env.COHERE_API_KEY || "" }),
     {
         collection,
-        indexName: "default", // The name of the Atlas search index. Defaults to "default"
-        textKey: "text", // The name of the collection field containing the raw content. Defaults to "text"
+        indexName: "vsearch_index", // The name of the Atlas search index. Defaults to "default"
+        textKey: "detail", // The name of the collection field containing the raw content. Defaults to "text"
         embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
     })
-    const assignedIds = await vectorStore.addDocuments([
-        { pageContent: "upsertable", metadata: {} },
-    ]);
 
-    const upsertedDocs = [{ pageContent: "overwritten", metadata: {} }];
+    
+    // const assignedIds = await vectorStore.addDocuments([
+    //     { pageContent: "upsertable", metadata: {} },
+    // ]);
 
-		await vectorStore.addDocuments(upsertedDocs, { ids: assignedIds });
+    // const upsertedDocs = [{ pageContent: "overwritten", metadata: {} }];
 
-		await client.close();
+	// await vectorStore.addDocuments(upsertedDocs, { ids: assignedIds });
 }
