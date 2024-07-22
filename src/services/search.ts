@@ -1,6 +1,8 @@
 import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { CohereEmbeddings } from "@langchain/cohere";
 import { MongoClient } from "mongodb";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+
 
 export const maxiMalmarginalRelevanceSearch = async() => {
     const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
@@ -39,6 +41,6 @@ export const maxiMalmarginalRelevanceSearch = async() => {
     // });
     // const retrieverOutput = await retriever.invoke("I got some field about 1 acre so I want to make it to be a garden with cactus");
     // console.log(retrieverOutput);
-
+    return resultOne
 }
 

@@ -14,8 +14,8 @@ export const createVectorStoreController = async(req: Request, res: Response) =>
 
 export const maxMalmarginalRelevanceSearchController = async(req: Request, res: Response) => {
     try {
-        await maxiMalmarginalRelevanceSearch()
-        res.status(201).json('search done')
+        const vectorStore = await maxiMalmarginalRelevanceSearch()
+        res.status(201).json({searchDone: vectorStore})
     } catch (error) {
         console.log(error);   
     }
