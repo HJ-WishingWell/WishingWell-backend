@@ -1,6 +1,7 @@
 import { createVectorStore } from '../../services/vectorize';
 import { maxiMalmarginalRelevanceSearch } from '../../services/search'
 import { Request, Response } from 'express';
+import { createChain } from '../../llm';
 
 export const createVectorStoreController = async(req: Request, res: Response) => {
     try {
@@ -15,6 +16,7 @@ export const createVectorStoreController = async(req: Request, res: Response) =>
 export const maxMalmarginalRelevanceSearchController = async(req: Request, res: Response) => {
     try {
         const vectorStore = await maxiMalmarginalRelevanceSearch()
+        // const chain = await createChain(vectorStore)
         res.status(201).json({searchDone: vectorStore})
     } catch (error) {
         console.log(error);   
