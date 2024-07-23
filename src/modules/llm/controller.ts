@@ -1,5 +1,5 @@
 // import { createVectorStore } from '../../services/vectorize';
-import { maxiMalmarginalRelevanceSearch } from '../../services/search'
+// import { maxiMalmarginalRelevanceSearch } from '../../services/search'
 import { Request, Response } from 'express';
 import { createChain } from '../../llm';
 
@@ -13,12 +13,12 @@ import { createChain } from '../../llm';
 //     }
 // }
 
-export const maxMalmarginalRelevanceSearchController = async(req: Request, res: Response) => {
-    try {
-        const vectorStore = await maxiMalmarginalRelevanceSearch()
-        // const chain = await createChain(vectorStore)
-        res.status(201).json({searchDone: vectorStore})
-    } catch (error) {
-        console.log(error);   
-    }
-}
+// export const maxMalmarginalRelevanceSearchController = async(req: Request, res: Response) => {
+//     try {
+//         const vectorStore = await maxiMalmarginalRelevanceSearch()
+//         // const chain = await createChain(vectorStore)
+//         res.status(201).json({searchDone: vectorStore})
+//     } catch (error) {
+//         console.log(error);   
+//     }
+// }

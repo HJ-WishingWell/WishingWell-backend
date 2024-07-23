@@ -9,6 +9,7 @@ import productRouter from './routers/product';
 import llmRouter from './routers/llm';
 import { feedProduct } from './services/feedProduct';
 import { embeddingProduct } from './services/vectorize';
+import { searchQuery } from './services/search';
 
 
 
@@ -35,6 +36,12 @@ app.post('/vectorize',async(req: Request, res: Response) => {
   await embeddingProduct()
   res.status(201).json('embed done')
 
+})
+
+app.post('/search-query',async(req: Request, res: Response) => {
+  const {query, maxPrice, category} = req.body
+  const result = await searchQuery(query, maxPrice, category)
+  res.status(201).json(result)
 })
 
 
