@@ -6,6 +6,7 @@ import { getallProduct } from "../modules/products/controller";
 
 dotenv.config();
 
+
 export const createVectorStore = async() => {
     const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
     const namespace = "mod_hackathon_db.prodcut_vectorstore_db";

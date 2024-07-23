@@ -6,10 +6,8 @@ export interface IProduct extends Document {
     price: number;
     category: string;
     amount: number;
-    merchant: {
-        type: Schema.Types.ObjectId,
-        ref: 'Merchant'
-    }
+    image: string;
+    merchant: string
 }
 
 const productSchema  = new Schema<IProduct>({
@@ -34,10 +32,14 @@ const productSchema  = new Schema<IProduct>({
         required: true
     },  
     merchant: {
-        type: Schema.Types.ObjectId,
-        ref: 'Product',
+        type: String,
         required: true
-    }   
+    },
+    image: {
+        type: String,
+        required: true
+    }
+
 })
 
 export default model<IProduct>('product_db', productSchema);
