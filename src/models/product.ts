@@ -8,6 +8,7 @@ export interface IProduct extends Document {
     amount: number;
     image: string;
     merchant: string
+    embedding:[number]
 }
 
 const productSchema  = new Schema<IProduct>({
@@ -38,6 +39,9 @@ const productSchema  = new Schema<IProduct>({
     image: {
         type: String,
         required: true
+    },
+    embedding: {
+        type: [Number],
     }
 
 })

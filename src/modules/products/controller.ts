@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import Product from '../../models/product'
-import { createVectorStore } from "../../services/vectorize"
+import { ObjectId } from "mongodb"
+// import { createVectorStore } from "../../services/vectorize"
 
 export const createProduct = async(req: Request, res: Response) => {
     const {name, price, detail, category, amount, merchant} = req.body
@@ -33,4 +34,9 @@ export const getallProduct = async() => {
     } catch (error) {
         console.log(error);
     }
+}
+
+export const insertEmbedding = async(productId: any, textVector: any) => {
+    console.log('insertEmbedding => ', productId, textVector)
+    await Product.findByIdAndUpdate({ _id: new ObjectId(productId) }, { $set: { embedding: textVector} });
 }

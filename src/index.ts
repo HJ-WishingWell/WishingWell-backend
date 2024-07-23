@@ -8,6 +8,7 @@ import merchantRouter from './routers/merchant';
 import productRouter from './routers/product';
 import llmRouter from './routers/llm';
 import { feedProduct } from './services/feedProduct';
+import { embeddingProduct } from './services/vectorize';
 
 
 
@@ -28,6 +29,12 @@ app.post('/feed-product',async(req: Request, res: Response) => {
   const rawData = req.body
   await feedProduct(rawData)
   res.status(201).json('feed done')
+})
+
+app.post('/vectorize',async(req: Request, res: Response) => {
+  await embeddingProduct()
+  res.status(201).json('embed done')
+
 })
 
 
