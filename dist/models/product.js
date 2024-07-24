@@ -1,17 +1,7 @@
-import { Schema, model } from "mongoose";
-
-export interface IProduct extends Document {
-    name: string;
-    detail: string;
-    price: number;
-    category: string;
-    amount: number;
-    image: string;
-    merchant: string
-    embedding:[number]
-}
-
-const productSchema  = new Schema<IProduct>({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = require("mongoose");
+const productSchema = new mongoose_1.Schema({
     name: {
         type: String,
         required: true
@@ -19,19 +9,19 @@ const productSchema  = new Schema<IProduct>({
     price: {
         type: Number,
         required: true
-    }, 
+    },
     detail: {
         type: String,
         required: true
-    }, 
+    },
     category: {
         type: String,
         required: true
-    },  
+    },
     amount: {
         type: Number,
         required: true
-    },  
+    },
     merchant: {
         type: String,
         required: true
@@ -43,7 +33,5 @@ const productSchema  = new Schema<IProduct>({
     embedding: {
         type: [Number],
     }
-
-})
-
-export default model<IProduct>('prodcut_dbs_ao', productSchema);
+});
+exports.default = (0, mongoose_1.model)('prodcut_dbs_ao', productSchema);

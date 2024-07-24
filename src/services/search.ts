@@ -1,60 +1,87 @@
-import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
-import { CohereEmbeddings } from "@langchain/cohere";
-import { MongoClient } from "mongodb";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-// import { embedText } from "./vectorize";
+import { PipelineStage } from "mongoose";
 import product from "../models/product";
-import { OpenAIEmbeddings } from "@langchain/openai";
+import { embedText } from "./vectorize";
 
-const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
-const database = client.db("mod_hackathon_db");
-const collection = database.collection("prodcut_vectorstore_db");
 
 export const searchSimilarProducts =  async(query: any, maxPrice: number, category: string) => {
   try {
-      // const dbConfig = {  
-      //   collection: collection,
-      //   indexName: "vector_index", // The name of the Atlas search index to use.
-      //   textKey: "text", // Field name for the raw text content. Defaults to "text".
-      //   embeddingKey: "embedding", // Field name for the vector embeddings. Defaults to "embedding".
-      // };
-      // const docs = await collection.find({}).toArray();
-      // const vectorStore = await MongoDBAtlasVectorSearch.fromDocuments(docs, new OpenAIEmbeddings(), dbConfig)
+    console.log('url: ', process.env.MONGO_ATLAS_URL)
+    // const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
+    // await client.connect();
+    // const database = client.db("mod_hackathon_db");
+    // const collection = database.collection("prodcut_dbs_aos");
 
-      const vectorStore = new MongoDBAtlasVectorSearch(
-        new OpenAIEmbeddings({ model: "text-embedding-ada-002", apiKey: process.env.OPENAI_API_KEY }),
-        {
-          collection,
-          indexName: "v2search_index", // The name of the Atlas search index. Defaults to "default"
-          textKey: "detail", // The name of the collection field containing the raw content. Defaults to "text"
-          embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
+    //  const aaa = await collection.find({});
+     console.log(query, maxPrice, category);
+
+    const queryVector = await embedText(query);
+    const agg = [
+      {
+        '$vectorSearch': {
+          'index': 'v2search_index_ao', 
+          'path': 'embedding', 
+          'queryVector': queryVector, 
+          // 'exact': true, 
+          'limit': 1000,
+          numCandidates: 1536
         }
-      );
-      const retrieverOutput = await vectorStore.similaritySearch(query, 10
-      , {
-        preFilter: {
-          // price: { $lte: maxPrice },
-          // category: category
-        }})
-      console.log(retrieverOutput);
+      },
+      {
+        "$match": {
+          price: { $lte: maxPrice },
+          category: category
+        }
+      },
+      {
+        '$project': {
+          'embedding': 0, 
+          'score': {
+            '$meta': 'vectorSearchScore'
+          }
+        }
+      }
+    ] as PipelineStage[];
+    // run pipeline
+    const result = product.aggregate(agg);
+     
+      // const vectorStore = new MongoDBAtlasVectorSearch(
+      //   new OpenAIEmbeddings({ model: "text-embedding-ada-002", apiKey: process.env.OPENAI_API_KEY }),
+      //   {
+      //     collection,
+      //     indexName: "v2search_index_ao", // The name of the Atlas search index. Defaults to "default"
+      //     textKey: "detail", // The name of the collection field containing the raw content. Defaults to "text"
+      //     embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
+      //   }
+      // );
+      // console.log({
+      //   query,
+      //   maxPrice,
+      //   category
+      // });
+      
 
-      //MMR
+      // // const result = await vectorStore.similaritySearch(query, 10
+      // // , {
+      // //   preFilter: {
+      // //     price: { $lte: maxPrice },
+      // //     category: category
+      // //   }}
+      // // )
       // const retriever = await vectorStore.asRetriever({
-      //   k: 10,
+      //   k: 4,
       //   searchType: "mmr",
       //   searchKwargs: {
       //     fetchK: 20,
       //     lambda: 0.1,
       //   },
+      //   filter: {
+      //     price: { $lte: maxPrice },
+      //     category: category
+      //   }
       // });
-      
-      // const retrieverOutput = await retriever.invoke(query);
-      
-      // console.log(retrieverOutput);
-      
-
-
-      return retrieverOutput;
+      // const result = await retriever.invoke(query);
+      console.log(result);
+      return result;
   } catch (error) {
       console.log(error);
   } 
@@ -72,7 +99,7 @@ export const searchQuery = async(query: string, maxPrice: number ,category: stri
 
 // export const maxiMalmarginalRelevanceSearch = async() => {
 //     const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
-//     const namespace = "mod_hackathon_db.prodcut_vectorstore_db";
+//     const namespace = "mod_hackathon_db.prodcut_dbs_ao";
 //     const [dbName, collectionName] = namespace.split(".");
 //     const collection = client.db(dbName).collection(collectionName);
     

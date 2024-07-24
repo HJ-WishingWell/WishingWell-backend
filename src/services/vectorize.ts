@@ -1,39 +1,39 @@
-import { MongoDBAtlasVectorSearch } from "@langchain/mongodb"
 import { CohereEmbeddings } from "@langchain/cohere";
-import { MongoClient } from "mongodb";
-import * as dotenv from "dotenv";
-import { getallProduct, insertEmbedding } from "../modules/products/controller";
-import axios from "axios";
+import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import axios from "axios";
+import * as dotenv from "dotenv";
+import { MongoClient } from "mongodb";
+import { getallProduct } from "../modules/products/controller";
 
 dotenv.config();
 
 const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
 const database = client.db("mod_hackathon_db");
-const collection = database.collection("product_dbs");
+const collection = database.collection("prodcut_dbs_aos");
 
-// export const embedText = async (text: string) => {
-//     try {
-//         const response = await axios.post('https://api.openai.com/v1/embeddings', {
-//             input: text,
-//             model: 'text-embedding-ada-002'
-//         }, {
-//             headers: {
-//                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-//                 'Content-Type': 'application/json'
-//             }
-//         });
-//         return response.data?.data[0]?.embedding;
-//     } catch (error) {
-//         console.error(error)
-//         throw new Error("Failed to embed text");
-//     }
-// }
+export const embedText = async (text: string) => {
+    try {
+        const response = await axios.post('https://api.openai.com/v1/embeddings', {
+            input: text,
+            model: 'text-embedding-ada-002'
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data?.data[0]?.embedding;
+    } catch (error) {
+        console.error(error)
+        throw new Error("Failed to embed text");
+    }
+}
 
 
 export const  embeddingProduct = async () => {
     const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
-    const namespace = "mod_hackathon_db.prodcut_vectorstore_db";
+    const namespace = "mod_hackathon_db.prodcut_dbs_aos";
     const [dbName, collectionName] = namespace.split(".");
     const collection = client.db(dbName).collection(collectionName);
 
@@ -88,7 +88,7 @@ export const  embeddingProduct = async () => {
 
 export const createVectorStore = async() => {
     const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
-    const namespace = "mod_hackathon_db.prodcut_vectorstore_db";
+    const namespace = "mod_hackathon_db.prodcut_dbs_aos";
     const [dbName, collectionName] = namespace.split(".");
     const collection = client.db(dbName).collection(collectionName);
 
