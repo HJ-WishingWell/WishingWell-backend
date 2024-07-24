@@ -1,17 +1,22 @@
 import { PipelineStage } from "mongoose";
 import product from "../models/product";
 import { embedText } from "./vectorize";
+import { createPromptTranslateTHtoENG } from "./llm-input-th-to-eng";
 
 var vector_penalty = 1;
 var full_text_penalty = 10;
 
 export const hybridSearchProduct =  async(query: any, maxPrice: number, category: string) => {
   try {
-    const queryVector = await embedText(query);
+
+    //translate TH input to Eng
+    const engQuery = await createPromptTranslateTHtoENG(query)
+    // console.log("🚀 ~ hybridSearchProduct ~ engQuery:", engQuery)
+    const queryVector = await embedText(engQuery);
     const agg = [
       {
         '$vectorSearch': {
-          'index': 'v2search_index_ao', 
+          'index': 'vector_product_search_index', 
           'path': 'embedding', 
           'queryVector': queryVector, 
           // 'exact': true, 
@@ -51,7 +56,7 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           "rank":1,
           "_id": "$docs._id", 
           "name": "$docs.name",
-          "detail": "$docs.detail",
+          "detail_eng": "$docs.detail_eng",
         }
       },
       {
@@ -60,10 +65,10 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           "pipeline": [
             {
               "$search": {
-                "index": "atlas_search_product_index",
+                "index": "al_search_product_index",
                 "phrase": {
-                  "query": query,
-                  "path": ["name", "detail"]
+                  "query": engQuery,
+                  "path": ["name_eng", "detail_eng"]
                 }
               }
             }, 
@@ -98,7 +103,7 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
                 "_id": "$docs._id",
                 "_pid": "$docs._id",
                 "name": "$docs.name",
-                "detail": "$docs.detail",
+                "detail_eng": "$docs.detail_eng",
               }
             }
           ]
@@ -107,7 +112,7 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
       {
         "$group": {
           // "_id": "$_id",
-          "_id": "$_id",
+          "_id": "$name",
           // "detail": "$detail",
           "vs_score": {"$max": "$vs_score"},
           "fts_score": {"$max": "$fts_score"}
@@ -143,7 +148,7 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
       //   new OpenAIEmbeddings({ model: "text-embedding-ada-002", apiKey: process.env.OPENAI_API_KEY }),
       //   {
       //     collection,
-      //     indexName: "v2search_index_ao", // The name of the Atlas search index. Defaults to "default"
+      //     indexName: "vector_product_search_index", // The name of the Atlas search index. Defaults to "default"
       //     textKey: "detail", // The name of the collection field containing the raw content. Defaults to "text"
       //     embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
       //   }
