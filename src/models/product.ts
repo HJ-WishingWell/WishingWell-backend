@@ -61,4 +61,4 @@ const productSchema  = new Schema<IProduct>({
 
 })
 
-export default model<IProduct>('prodcut_dbs_ao_test', productSchema);
+export default model<IProduct>('prodcut_dbs_ao_v2', productSchema);
