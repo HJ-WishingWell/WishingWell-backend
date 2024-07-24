@@ -2,18 +2,11 @@ import { PipelineStage } from "mongoose";
 import product from "../models/product";
 import { embedText } from "./vectorize";
 
+var vector_penalty = 1;
+var full_text_penalty = 10;
 
 export const searchSimilarProducts =  async(query: any, maxPrice: number, category: string) => {
   try {
-    console.log('url: ', process.env.MONGO_ATLAS_URL)
-    // const client = new MongoClient(process.env.MONGO_ATLAS_URL || "");
-    // await client.connect();
-    // const database = client.db("mod_hackathon_db");
-    // const collection = database.collection("prodcut_dbs_aos");
-
-    //  const aaa = await collection.find({});
-     console.log(query, maxPrice, category);
-
     const queryVector = await embedText(query);
     const agg = [
       {
@@ -33,13 +26,115 @@ export const searchSimilarProducts =  async(query: any, maxPrice: number, catego
         }
       },
       {
-        '$project': {
-          'embedding': 0, 
-          'score': {
-            '$meta': 'vectorSearchScore'
-          }
+        "$group": {
+          "_id": null,
+          "docs": {"$push": "$$ROOT"},
         }
-      }
+      },
+       {
+        "$unwind": {
+          "path": "$docs", 
+          "includeArrayIndex": "rank"
+        }
+      },
+       {
+        "$addFields": {
+          "vs_score": {
+            "$divide": [1.0, {"$add": ["$rank", vector_penalty, 1]}]
+          },
+        }
+      },
+     
+      {
+        "$project": {
+          "vs_score": 1,
+          "rank":1,
+          "_id": "$docs._id", 
+          "name": "$docs.name",
+          "detail": "$docs.detail",
+        }
+      },
+      {
+        "$unionWith": {
+          "coll": "product_dbs_aos",
+          "pipeline": [
+            {
+              "$search": {
+                "index": "atlas_search_product_index",
+                "phrase": {
+                  "query": query,
+                  "path": ["name", "detail"]
+                }
+              }
+            }, 
+            {
+              "$limit": 20
+            }, 
+            {
+              "$group": {
+                "_id": null,
+                "docs": {"$push": "$$ROOT"},
+              }
+            }, 
+            {
+              "$unwind": {
+                "path": "$docs", 
+                "includeArrayIndex": "rank"
+              }
+            }, 
+            {
+              "$addFields": {
+                "fts_score": {
+                  "$divide": [
+                    1.0,
+                    {"$add": ["$rank", full_text_penalty, 1]}
+                  ]
+                }
+              }
+            },
+            {
+              "$project": {
+                "fts_score": 1,
+                "_id": "$docs._id",
+                "_pid": "$docs._id",
+                "name": "$docs.name",
+                "detail": "$docs.detail",
+              }
+            }
+          ]
+        }
+      },
+      {
+        "$group": {
+          // "_id": "$_id",
+          "_id": "$_id",
+          // "detail": "$detail",
+          "vs_score": {"$max": "$vs_score"},
+          "fts_score": {"$max": "$fts_score"}
+        }
+      },
+      {
+        "$project": {
+          "_id": 1,
+          "name": 1,
+          "_pid": 1,
+          // "detail": 1,
+          "vs_score": {"$ifNull": ["$vs_score", 0]},
+          "fts_score": {"$ifNull": ["$fts_score", 0]}
+        }
+      },
+      {
+        "$project": {
+          "score": {"$add": ["$fts_score", "$vs_score"]},
+          "_id": 1,
+          "name": 1,
+          // "detail": 1,
+          "vs_score": 1,
+          "fts_score": 1
+        }
+      },
+      {"$sort": {"score": -1}},
+      {"$limit": 10}
     ] as PipelineStage[];
     // run pipeline
     const result = product.aggregate(agg);
