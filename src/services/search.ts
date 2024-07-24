@@ -11,8 +11,8 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
 
     //translate TH input to Eng
     const engQuery = await createPromptTranslateTHtoENG(query)
-    // console.log("🚀 ~ hybridSearchProduct ~ engQuery:", engQuery)
     const queryVector = await embedText(engQuery);
+    console.log("🚀 ~ hybridSearchProduct ~ engQuery:", engQuery)
     const agg = [
       {
         '$vectorSearch': {
@@ -61,14 +61,16 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
       },
       {
         "$unionWith": {
-          "coll": "product_dbs_aos",
+          "coll": "prodcut_dbs_ao_v2",
           "pipeline": [
             {
-              "$search": {
-                "index": "al_search_product_index",
-                "phrase": {
-                  "query": engQuery,
-                  "path": ["name_eng", "detail_eng"]
+              $search: {
+                index: "al_search_product_index",
+                text: {
+                  query: engQuery,
+                  path: {
+                    wildcard: "*"
+                  }
                 }
               }
             }, 
@@ -136,6 +138,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           // "detail": 1,
           "vs_score": 1,
           "fts_score": 1
+        }
+      },
+      {
+        "$match": {
+          "vs_score": {"$gt": 0},
+          "fts_score": {"$gt": 0},
         }
       },
       {"$sort": {"score": -1}},
