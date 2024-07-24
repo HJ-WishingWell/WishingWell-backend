@@ -2,9 +2,12 @@ import { Schema, model } from "mongoose";
 
 export interface IProduct extends Document {
     name: string;
+    name_eng: string
     detail: string;
+    detail_eng: string
     price: number;
     category: string;
+    category_eng: string
     amount: number;
     image: string;
     merchant: string
@@ -16,6 +19,10 @@ const productSchema  = new Schema<IProduct>({
         type: String,
         required: true
     },
+    name_eng: {
+        type: String,
+        required: true
+    },
     price: {
         type: Number,
         required: true
@@ -24,7 +31,15 @@ const productSchema  = new Schema<IProduct>({
         type: String,
         required: true
     }, 
+    detail_eng: {
+        type: String,
+        required: true
+    }, 
     category: {
+        type: String,
+        required: true
+    },  
+    category_eng: {
         type: String,
         required: true
     },  
@@ -46,4 +61,4 @@ const productSchema  = new Schema<IProduct>({
 
 })
 
-export default model<IProduct>('prodcut_dbs_ao', productSchema);
+export default model<IProduct>('prodcut_dbs_ao_test', productSchema);

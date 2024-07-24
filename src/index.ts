@@ -10,6 +10,7 @@ import llmRouter from './routers/llm';
 import { feedProduct } from './services/feedProduct';
 import { embeddingProduct } from './services/vectorize';
 import { searchQuery } from './services/search';
+import { createPromptTranslateTHtoENG } from './services/llm-input-th-to-eng';
 
 
 
@@ -44,6 +45,17 @@ app.post('/search-query',async(req: Request, res: Response) => {
   res.status(201).json(result)
 })
 
+app.post('/input-th-to-eng', async(req: Request, res: Response) => {
+  const {input} = req.body
+  const result = await createPromptTranslateTHtoENG(input)
+  res.status(201).json(result)
+})
+
+app.post('/input-eng-to-th', async(req: Request, res: Response) => {
+  const {input} = req.body
+  const result = await createPromptTranslateTHtoENG(input)
+  res.status(201).json(result)
+})
 
 app.listen(port, async() => {
   await connectDB()
