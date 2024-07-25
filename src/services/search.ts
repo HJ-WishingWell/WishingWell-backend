@@ -172,12 +172,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           "fts_score": 1
         }
       },
-      {
-        "$match": {
-          "vs_score": {"$gt": 0},
-          "fts_score": {"$gt": 0},
-        }
-      },
+      // {
+      //   "$match": {
+      //     "vs_score": {"$gt": 0},
+      //     "fts_score": {"$gt": 0},
+      //   }
+      // },
       {"$sort": {"score": -1}},
       {"$limit": 10}
     ] as PipelineStage[];
