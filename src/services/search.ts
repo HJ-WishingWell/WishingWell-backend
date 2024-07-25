@@ -26,12 +26,7 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           numCandidates: 1536
         }
       },
-      {
-        "$match": {
-          price: { $lte: maxPrice },
-          category: category
-        }
-      },
+      
       {
         "$group": {
           "_id": null,
@@ -178,6 +173,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
       //     "fts_score": {"$gt": 0},
       //   }
       // },
+      {
+        "$match": {
+          price: { $lte: maxPrice },
+          category: category
+        }
+      },
       {"$sort": {"score": -1}},
       {"$limit": 10}
     ] as PipelineStage[];
