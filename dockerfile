@@ -11,9 +11,10 @@ COPY . .
 RUN npm install
 
 
-RUN npm run build
+# RUN npm run build
 
 EXPOSE 4455
 
 # not cd to folder becase of WORKDIR
-CMD ["node", "dist/index.js"]
+# CMD ["node", "dist/index.js"]
+CMD ["npm", "run" ,"dev"]
