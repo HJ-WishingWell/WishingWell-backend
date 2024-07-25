@@ -1,18 +1,20 @@
 import { PipelineStage } from "mongoose";
 import product from "../models/product";
 import { embedText } from "./vectorize";
-import { createPromptTranslateTHtoENG } from "./llm-input-th-to-eng";
+import { createPromptFocusProduct, createPromptTranslateTHtoENG } from "./llm-input-th-to-eng";
 
 var vector_penalty = 1;
 var full_text_penalty = 10;
 
 export const hybridSearchProduct =  async(query: any, maxPrice: number, category: string) => {
   try {
+    const queryFocus = await createPromptFocusProduct(query)
+    console.log('queryFocus => ',queryFocus);
 
     //translate TH input to Eng
-    const engQuery = await createPromptTranslateTHtoENG(query)
+    const engQuery = await createPromptTranslateTHtoENG(queryFocus)
+
     const queryVector = await embedText(engQuery);
-    console.log("🚀 ~ hybridSearchProduct ~ engQuery:", engQuery)
     const agg = [
       {
         '$vectorSearch': {
