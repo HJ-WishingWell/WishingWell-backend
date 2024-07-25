@@ -3,6 +3,8 @@ import { createChain } from './llm';
 import * as dotenv from "dotenv";
 import { connectDB } from './config/mongo'
 
+import cors from 'cors';
+
 //router
 import merchantRouter from './routers/merchant';
 import productRouter from './routers/product';
@@ -21,6 +23,8 @@ const app = express();
 const port = 4455;
 
 app.use(express.json());
+
+app.use(cors());
 
 
 app.use('/api', merchantRouter)
