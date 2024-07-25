@@ -27,6 +27,10 @@ app.use('/api', merchantRouter)
 app.use('/api', productRouter)
 app.use('/api', llmRouter)
 
+app.get('/test', (req: Request, res: Response) => {
+  res.send('Hello World!')
+})
+
 app.post('/feed-product',async(req: Request, res: Response) => {
   const rawData = req.body
   await feedProduct(rawData)

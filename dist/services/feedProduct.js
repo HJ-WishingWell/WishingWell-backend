@@ -21,6 +21,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.feedProduct = void 0;
 const product_1 = __importDefault(require("../models/product"));
+const llm_input_th_to_eng_1 = require("./llm-input-th-to-eng");
 const vectorize_1 = require("./vectorize");
 // import { embedText } from "./vectorize";
 const feedProduct = (rawData) => __awaiter(void 0, void 0, void 0, function* () {
@@ -32,9 +33,18 @@ const feedProduct = (rawData) => __awaiter(void 0, void 0, void 0, function* () 
                 _d = rawData_1_1.value;
                 _a = false;
                 const data = _d;
-                data['embedding'] = yield (0, vectorize_1.embedText)(`${data.name} ${data.detail}`);
+                //translate product_name th to eng
+                const product_name_eng = yield (0, llm_input_th_to_eng_1.createPromptTranslateTHtoENG)(data.name);
+                const product_detail_eng = yield (0, llm_input_th_to_eng_1.createPromptTranslateTHtoENG)(data.detail);
+                const product_cateofry_eng = yield (0, llm_input_th_to_eng_1.createPromptTranslateTHtoENG)(data.category);
+                //embedding with eng version
+                data['embedding'] = yield (0, vectorize_1.embedText)(`${data.name_eng} ${data.detail_eng}`);
+                //add eng content
+                data.name_eng = product_name_eng;
+                data.detail_eng = product_detail_eng;
+                data.category_eng = product_cateofry_eng;
                 const product = new product_1.default(data);
-                const saveProduct = yield product.save();
+                yield product.save();
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }

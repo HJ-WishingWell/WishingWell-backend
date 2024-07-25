@@ -6,6 +6,10 @@ const productSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    name_eng: {
+        type: String,
+        required: true
+    },
     price: {
         type: Number,
         required: true
@@ -14,7 +18,15 @@ const productSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    detail_eng: {
+        type: String,
+        required: true
+    },
     category: {
+        type: String,
+        required: true
+    },
+    category_eng: {
         type: String,
         required: true
     },
@@ -34,4 +46,4 @@ const productSchema = new mongoose_1.Schema({
         type: [Number],
     }
 });
-exports.default = (0, mongoose_1.model)('prodcut_dbs_ao', productSchema);
+exports.default = (0, mongoose_1.model)('prodcut_dbs_ao_v2', productSchema);

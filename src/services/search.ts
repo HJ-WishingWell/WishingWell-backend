@@ -56,6 +56,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           "rank":1,
           "_id": "$docs._id", 
           "name": "$docs.name",
+          "detail": "$docs.detail",
+          "image": "$docs.image",
+          "price": "$docs.price",
+          "category": "$docs.category",
+          "amount": "$docs.amount",
+          "merchant": "$docs.merchant",
           "detail_eng": "$docs.detail_eng",
         }
       },
@@ -105,6 +111,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
                 "_id": "$docs._id",
                 "_pid": "$docs._id",
                 "name": "$docs.name",
+                "detail": "$docs.detail",
+                "image": "$docs.image",
+                "price": "$docs.price",
+                "category": "$docs.category",
+                "amount": "$docs.amount",
+                "merchant": "$docs.merchant",
                 "detail_eng": "$docs.detail_eng",
               }
             }
@@ -113,9 +125,15 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
       },
       {
         "$group": {
-          // "_id": "$_id",
-          "_id": "$name",
-          // "detail": "$detail",
+          "_id": "$_id",
+          // "_id": "$name",
+          "name": {"$first": "$name"},
+          "detail": {"$first": "$detail"},
+          "image": {"$first": "$image"},
+          "price": {"$first": "$price"},
+          "category": {"$first": "$category"},
+          "amount": {"$first": "$amount"},
+          "merchant": {"$first": "$merchant"},
           "vs_score": {"$max": "$vs_score"},
           "fts_score": {"$max": "$fts_score"}
         }
@@ -126,6 +144,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           "name": 1,
           "_pid": 1,
           // "detail": 1,
+          "detail": 1,
+          "image": 1,
+          "price": 1,
+          "category": 1,
+          "amount": 1,
+          "merchant": 1,
           "vs_score": {"$ifNull": ["$vs_score", 0]},
           "fts_score": {"$ifNull": ["$fts_score", 0]}
         }
@@ -135,6 +159,12 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
           "score": {"$add": ["$fts_score", "$vs_score"]},
           "_id": 1,
           "name": 1,
+          "detail": 1,
+          "image": 1,
+          "price": 1,
+          "category": 1,
+          "amount": 1,
+          "merchant": 1,
           // "detail": 1,
           "vs_score": 1,
           "fts_score": 1
@@ -189,7 +219,13 @@ export const hybridSearchProduct =  async(query: any, maxPrice: number, category
       // });
       // const result = await retriever.invoke(query);
       console.log(result);
+
+
+
+      
       return result;
+
+
   } catch (error) {
       console.log(error);
   } 

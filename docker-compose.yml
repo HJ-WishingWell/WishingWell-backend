@@ -1,0 +1,7 @@
+services:
+  ws-backend:
+    container_name: ws-backend-container
+    build: .
+    ports:
+      - 4455:4455
+    restart: unless-stopped

@@ -45,6 +45,7 @@ const llm_1 = __importDefault(require("./routers/llm"));
 const feedProduct_1 = require("./services/feedProduct");
 const vectorize_1 = require("./services/vectorize");
 const search_1 = require("./services/search");
+const llm_input_th_to_eng_1 = require("./services/llm-input-th-to-eng");
 dotenv.config();
 const app = (0, express_1.default)();
 const port = 4455;
@@ -64,6 +65,16 @@ app.post('/vectorize', (req, res) => __awaiter(void 0, void 0, void 0, function*
 app.post('/search-query', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, maxPrice, category } = req.body;
     const result = yield (0, search_1.searchQuery)(query, maxPrice, category);
+    res.status(201).json(result);
+}));
+app.post('/input-th-to-eng', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { input } = req.body;
+    const result = yield (0, llm_input_th_to_eng_1.createPromptTranslateTHtoENG)(input);
+    res.status(201).json(result);
+}));
+app.post('/input-eng-to-th', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { input } = req.body;
+    const result = yield (0, llm_input_th_to_eng_1.createPromptTranslateTHtoENG)(input);
     res.status(201).json(result);
 }));
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
