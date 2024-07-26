@@ -9,9 +9,16 @@ export const feedProduct = async(rawData: any) => {
     try {
         for await (const data of rawData) {
             //translate product_name th to eng
-            const product_name_eng = await createPromptTranslateTHtoENG(data.name)
-            const product_detail_eng = await createPromptTranslateTHtoENG(data.detail)
-            const product_cateofry_eng = await createPromptTranslateTHtoENG(data.category)
+            const resultproduct_name_eng = await createPromptTranslateTHtoENG(data.name)
+            const product_name_eng = resultproduct_name_eng.replace(/\n/g, ' ');
+
+            const resultproduct_detail_eng = await createPromptTranslateTHtoENG(data.detail)
+            const product_detail_eng =resultproduct_detail_eng.replace(/\n/g, ' ');
+
+            const resultproduct_cateofry_eng= await createPromptTranslateTHtoENG(data.category)
+            const product_cateofry_eng = resultproduct_cateofry_eng.replace(/\n/g, ' ');
+
+            
 
             //embedding with eng version
             data['embedding'] = await embedText(`${data.name_eng} ${data.detail_eng}`);
